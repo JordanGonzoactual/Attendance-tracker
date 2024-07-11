@@ -1,12 +1,10 @@
 import openpyxl
 import smtplib
 import email
-
 # Workbook
-wb = Workbook()
-# grabs active worksheet
-ws = wb.active
+book = openpyxl.load_workbook('D:\\attendance.xlsx')
 
+# saves excel on every update
 def savefile():
-    book.save(r'<your-path>\attendance.xlsx')
+    book.save(r'c:\Users\jorda\OneDrive\Documents\attendance.xlsx')
     print("saved!")
