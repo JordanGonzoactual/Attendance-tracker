@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 book = openpyxl.load_workbook('D:\\attendance.xlsx')
 ws = book['attendance']
 # staff emails
-staff_mails=['targyarg13@gmail.com', 'largmarg814@gmail.com']
+staff_mail=['targyarg13@gmail.com']
 # Max amount of missed days
 attendance_threshold= 3
 # Chooses the sheet
@@ -29,11 +29,28 @@ def savefile():
     print("saved!")
 
 # To track attendance
-def check(no_of_days, row_num, b):
-    #to use the globally declared lists and strings
-    global staff_mails
-    global attendance_threshold
-    # for students
+def sendemail(to_address, subject, body):
+    msg = MIMEMultipart()
+    msg['From'] = staff_mail
+    msg['To'] = to_address
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+
+
+    # for students if missed days
+    if missed_days >= attendance_threshold:
+        subject = "Attendance warning"
+        body = (f"Dear {student_name},\n\n"
+                f"You have missed {missed_days} days of class. " 
+                "Please be aware that you are approaching the max days allowed to miss."
+                "Best Regards, \n"
+                "Attendance office")
+        send_email(student_email, subject, body)
+        print(f"Email sent to {student_name} at {student_email}")
+
+
+
 
 # iterates over the rows in excel
 for row in ws.iter_rows(row_num=2,values_only=True,max_row=ws.max_row, min_col=1, max_col=3):
