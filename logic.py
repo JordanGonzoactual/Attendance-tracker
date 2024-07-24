@@ -9,9 +9,11 @@ class Student:
         self.name= name
         self.email= email
         self.status = status 
+        self.no_of_days = 0
        # Marks students late 
     def mark_late(self):
         self.status = 'Late'
+        self.no_of_days +=1
 
 # To send email
     def send_email(to_address, subject, body):
@@ -30,8 +32,8 @@ class Student:
     def notify_late(self, name, student, email,):
         if self.status == 'Late':
             subject = "Attendance warning"
-            body = (f"Dear {name},\n\n"
-                f"You have missed {no_of_days} days of class. " 
+            body = (f"Dear {self.name},\n\n"
+                f"You have missed {self.no_of_days} days of class. " 
                 "Please be aware that you are approaching the max days allowed to miss."
                 "Best Regards, \n"
                 "Attendance office")
@@ -46,7 +48,8 @@ def process_attendance(sheet):
         student_name = row[0]
         email = row[1]
         no_of_days = row[2]
-        student = (student_name, email, status)
+        student = (student_name, email, status, no_of_days)
+        students.append(student)
         if student.status == 'Late':
             student.notify_late()
     return student
@@ -60,9 +63,6 @@ def savefile():
 staff_mail=['targyarg13@gmail.com']
 # Max amount of missed days
 attendance_threshold= 3
-# Chooses the sheet
-#counting number of rows / student
-r = sheet.max_row
 # number of days students have missed
 status = no_of_days= []
 # list of students to remind
@@ -71,7 +71,7 @@ l1 =[]
 m1 = "Warning!!! you can only miss more day for CI class"
 m2 = " Warning !!! you can only miss one more day for python class"
 m3 = "Warning!!! you can only miss one more day for DM class"
-
+# main script
 if __name__ == "__main__":
     book = openpyxl.load_workbook('D:\\attendance.xlsx')
     ws = book['attendance']
