@@ -44,17 +44,16 @@ class Student:
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
     
-    
     # for students if missed days
-        if no_of_days >= attendance_threshold:
-            subject = "Attendance warning"
-            body = (f"Dear {student_name},\n\n"
-                    f"You have missed {missed_days} days of class. " 
-                    "Please be aware that you are approaching the max days allowed to miss."
-                    "Best Regards, \n"
-                    "Attendance office")
-            send_email(student_email, subject, body)
-            print(f"Email sent to {student_name} at {student_email}")
+    def notify_late(self, name, student, email,):
+        subject = "Attendance warning"
+        body = (f"Dear {name},\n\n"
+                f"You have missed {no_of_days} days of class. " 
+                "Please be aware that you are approaching the max days allowed to miss."
+                "Best Regards, \n"
+                "Attendance office")
+        self.send_email(subject, body)
+        print(f"Email sent to {student} at {email}")
 
 
 def Process_attendance(sheet):
