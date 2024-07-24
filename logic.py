@@ -43,17 +43,23 @@ class Student:
         msg['To'] = to_address
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
+        
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()# start TLS for security
+            server.login('targyarg13@gmail.com', 'nJXD3XyV') #logs in to staff email account
+            server.send_message(msg)
     
     # for students if missed days
     def notify_late(self, name, student, email,):
-        subject = "Attendance warning"
-        body = (f"Dear {name},\n\n"
+        if self.status == 'Late':
+            subject = "Attendance warning"
+            body = (f"Dear {name},\n\n"
                 f"You have missed {no_of_days} days of class. " 
                 "Please be aware that you are approaching the max days allowed to miss."
                 "Best Regards, \n"
                 "Attendance office")
-        self.send_email(subject, body)
-        print(f"Email sent to {student} at {email}")
+            self.send_email(subject, body)
+            print(f"Email sent to {student} at {email}")
 
 
 def Process_attendance(sheet):
