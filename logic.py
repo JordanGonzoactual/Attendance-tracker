@@ -5,17 +5,24 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os 
 import logging
+
+os.environ['EMAIL_USER'] = 'targyarg13@gmail.com'
+os.environ['EMAIL_PASS'] = 'okzofawtggnwmowq'
 # loads environmental variables
 email_user = os.getenv('targyarg13@gmail.com')
-email_pass = os.getenv('nJXD3XyV')
+email_pass = os.getenv('okzofawtggnwmowq')
 print(f"EMAIL_USER: {email_user}")
 print(f"EMAIL_PASS: {email_pass}")
+#verifies environmental variables are set
+if not email_user or not email_pass:
+    raise EnvironmentError("EMAIL_USER AND EMAIL_PASS environment variables must be set")
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 class Student:
-    def __init__(self, name, email, status, no_of_days):
-        self.name= name
-        self.email= email
+    def __init__(self, name, email, status, days):
+        self.name = name
+        self.email = email
         self.status = status 
         self.no_of_days = 0
        # Marks students late 
@@ -24,23 +31,26 @@ class Student:
         self.no_of_days +=1
 
 # To send email
-    def send_email(to_address, subject, body):
+    def send_email(self, subject, body):
         msg = MIMEMultipart()
-        msg['From'] = email_user
-        msg['To'] = to_address
+        msg['From'] = os.getenv('EMAIL_USER')
+        msg['To'] = self.email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
         
         try:
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()# start TLS for security
-                server.login('targyarg13@gmail.com', 'nJXD3XyV') #logs in to staff email account
-                server.send_message(msg)
+                server.login(email_user, email_pass) #logs in to staff email account
+                server.mail(self.email, email_user, msg)
+                logging.info(f"EMail sent to {self.name} at {self.email}")
+        except smtplib.SMTPAuthenticationError as e:
+            logging.error(f"SMTP Authentication Error: Please check your email and password or App password settings")
         except Exception as e:
             logging.error("Failed to send email to {self.name} at {self.email}: {e}")
     
     # for students if missed days
-    def notify_late(self, name, student, email):
+    def notify_late(self, *args):
         if self.status == 'Late':
             subject = "Attendance warning"
             body = (f"Dear {self.name},\n\n"
@@ -49,7 +59,7 @@ class Student:
                 "Best Regards, \n"
                 "Attendance office")
             self.send_email(subject, body)
-            print(f"Email sent to {student} at {email}")
+            
 
 
     def __str__(self):
