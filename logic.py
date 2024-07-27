@@ -22,7 +22,7 @@ class Student:
         self.name = name
         self.email = email
         self.status = status 
-        self.no_of_days = 0
+        self.no_of_days = days if days else 0
        # Marks students late 
     def mark_late(self):
         self.status = 'Late'
@@ -41,7 +41,7 @@ class Student:
                 server.starttls()# start TLS for security
                 server.login(email_user, email_pass) #logs in to staff email account
                 server.sendmail(self.email, email_user, msg)
-                logging.info(f"EMail sent to {self.name} at {self.email}")
+                logging.info(f"Email sent to {self.name} at {self.email}")
         except smtplib.SMTPAuthenticationError as e:
             logging.error(f"SMTP Authentication Error: Please check your email and password or App password settings")
         except Exception as e:
@@ -62,12 +62,21 @@ class Student:
 
     def __str__(self):
         return f'Student(Name: {self.name}, Email: {self.email}, Status: {self.status}, No of Days Late: {self.no_of_days})'
+
+def validate_excel_structure(sheet, expected_columns):
+    header= [cell.value for cell in next(sheet.iter_rows(max_row=1))]
+    missing_columns = [col for col in expected_columns if col not in header]
+    if missing_columns:
+        raise ValueError(f"Missing expected columns: {','.join(missing_columns)}")
+    logging.info("Excel structure validated succesfully.")
+
+
 # for processing attendance
 def process_attendance(sheet):
     logging.info("Starting to process attendance")
     students =[]
 # iterates over the rows in excel
-    for row in sheet.iter_rows(max_row=ws.max_row, min_col=1, max_col=4, values_only=True):
+    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=4, values_only=True):
         name, email, status, no_of_days = row
         logging.info(f"Processing student: {name}, {email}, {status}, {no_of_days}")
         student = Student(name, email, status, no_of_days)
@@ -98,22 +107,27 @@ l1 =[]
 m1 = "Warning!!! you can only miss more day for CI class"
 m2 = " Warning !!! you can only miss one more day for python class"
 m3 = "Warning!!! you can only miss one more day for DM class"
+
 # main script
 if __name__ == "__main__":
+    
     try:
         file_path = r'H:\Python\Attendancetracker\attendance.xlsx'
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"The file {file_path} does not exist.")
         
-        book = openpyxl.load_workbook(r'H:\Python\Attendancetracker\attendance.xlsx')
+
         workbook = load_workbook(file_path)
         logging.info(f"Available worksheets: {workbook.sheetnames}")
         
         if "attendance" not in workbook.sheetnames:
             raise ValueError("Worksheet 'attendance' does not exist.")
-        
-        sheet = workbook["attendance"]
-        ws = workbook.active
+         
+        sheet = workbook["attendance"] 
+        #validates structure of excel file
+        expected_columns = ["Name", "Email", "Status", "No_of_Days"]
+        validate_excel_structure(sheet, expected_columns)
+       
         process_attendance(sheet)
         save_workbook(workbook, file_path)
     except Exception as e:
