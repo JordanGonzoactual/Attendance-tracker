@@ -6,11 +6,9 @@ from email.mime.text import MIMEText
 import os 
 import logging
 
-os.environ['EMAIL_USER'] = 'targyarg13@gmail.com'
-os.environ['EMAIL_PASS'] = 'okzofawtggnwmowq'
 # loads environmental variables
-email_user = os.getenv('targyarg13@gmail.com')
-email_pass = os.getenv('okzofawtggnwmowq')
+email_user = os.getenv('EMAIL_USER')
+email_pass = os.getenv('EMAIL_PASS')
 print(f"EMAIL_USER: {email_user}")
 print(f"EMAIL_PASS: {email_pass}")
 #verifies environmental variables are set
@@ -33,7 +31,7 @@ class Student:
 # To send email
     def send_email(self, subject, body):
         msg = MIMEMultipart()
-        msg['From'] = os.getenv('EMAIL_USER')
+        msg['From'] = email_user
         msg['To'] = self.email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
@@ -42,7 +40,7 @@ class Student:
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()# start TLS for security
                 server.login(email_user, email_pass) #logs in to staff email account
-                server.mail(self.email, email_user, msg)
+                server.sendmail(self.email, email_user, msg)
                 logging.info(f"EMail sent to {self.name} at {self.email}")
         except smtplib.SMTPAuthenticationError as e:
             logging.error(f"SMTP Authentication Error: Please check your email and password or App password settings")
@@ -69,7 +67,7 @@ def process_attendance(sheet):
     logging.info("Starting to process attendance")
     students =[]
 # iterates over the rows in excel
-    for row in ws.iter_rows(max_row=ws.max_row, min_col=1, max_col=4, values_only=True):
+    for row in sheet.iter_rows(max_row=ws.max_row, min_col=1, max_col=4, values_only=True):
         name, email, status, no_of_days = row
         logging.info(f"Processing student: {name}, {email}, {status}, {no_of_days}")
         student = Student(name, email, status, no_of_days)
