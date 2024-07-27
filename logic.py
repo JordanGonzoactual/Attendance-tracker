@@ -42,6 +42,7 @@ class Student:
                 server.login(email_user, email_pass) #logs in to staff email account
                 server.sendmail(self.email, email_user, msg)
                 logging.info(f"Email sent to {self.name} at {self.email}")
+                print(f"Email sent to {self.name} at {self.email}")
         except smtplib.SMTPAuthenticationError as e:
             logging.error(f"SMTP Authentication Error: Please check your email and password or App password settings")
         except Exception as e:
@@ -132,5 +133,7 @@ if __name__ == "__main__":
         save_workbook(workbook, file_path)
     except Exception as e:
         logging.error(f"Failed to run the sript: {e}")
+    finally:
+        print("Script finished successfully.")
        
 
