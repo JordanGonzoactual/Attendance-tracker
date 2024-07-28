@@ -35,7 +35,7 @@ class Student:
         msg['To'] = self.email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
-        
+        logging.debug(f"Sending email to {self.email}, with subject: {subject}")
         try:
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()# start TLS for security
@@ -46,7 +46,8 @@ class Student:
         except smtplib.SMTPAuthenticationError as e:
             logging.error(f"SMTP Authentication Error: Please check your email and password or App password settings")
         except Exception as e:
-            logging.error("Failed to send email to {self.name} at {self.email}: {e}")
+            logging.error(f"Failed to send email to {self.name} at {self.email}: {str(e)}")
+            logging.error("Exception details:", exc_info=True)
     
     # for students if missed days
     def notify_late(self, *args):
