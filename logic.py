@@ -39,8 +39,8 @@ class Student:
         try:
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()# start TLS for security
-                server.login(os.getenv('EMAIL_USER'), os.getenv('EMAIL_PASS'), msg.as_string()) #logs in to staff email account
-                server.sendmail(self.email, email_user, msg)
+                server.login(os.getenv('EMAIL_USER'), os.getenv('EMAIL_PASS')) #logs in to staff email account
+                server.sendmail(self.email, email_user, msg.as_string())
                 logging.info(f"Email sent to {self.name} at {self.email}")
                 print(f"Email sent to {self.name} at {self.email}")
         except smtplib.SMTPAuthenticationError as e:
